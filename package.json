@@ -1,7 +1,7 @@
 {
   "name": "git2consul",
   "description": "System for moving data from git to consul",
-  "version": "0.11.0",
+  "version": "0.1.1",
   "contributors": [
     {
       "name": "Ryan Breen",
@@ -21,9 +21,10 @@
     "mkdirp": "0.5.0",
     "rimraf": "2.2.8",
     "underscore": "^1.8.0",
-    "properties": "git@github.com:gumtreeuk/node-properties#master"
+    "properties": "https://github.com/gumtreeuk/node-properties#master"
   },
   "devDependencies": {
+    "grunt": "^0.4.5",
     "istanbul": "0.2.11",
     "mocha": "1.20.1",
     "request": "^2.42.0",

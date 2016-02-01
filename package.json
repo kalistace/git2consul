@@ -21,7 +21,7 @@
     "mkdirp": "0.5.0",
     "rimraf": "2.2.8",
     "underscore": "^1.8.0",
-    "properties": "git@github.com:gumtreeuk/node-properties#master"
+    "properties": "https://github.com/gumtreeuk/node-properties#stable"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

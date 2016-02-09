@@ -345,7 +345,8 @@ Usage example :
 - `systemctl status git2consul` to check that the service is running properly.
 
 
-The logs are stored in syslog by default, to check the logs just do `journalctl -u git2consul`
+The logs are stored in syslog by default, to check the logs just do `journalctl -u git2consul`.
+
 A log directory is also available under `/var/log/git2consul` but you have to add a logger option to the configuration.
 
 Logger example :

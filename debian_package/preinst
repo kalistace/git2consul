@@ -19,6 +19,7 @@ case "$1" in
 
         #fixes permissions.
         install -d -ogit2consul -ggit2consul -gadm -m750 /var/lib/git2consul
+        install -d -ogit2consul -gadm -m750 /var/log/git2consul
     ;;
 esac
 

@@ -345,7 +345,25 @@ Usage example :
 - `systemctl status git2consul` to check that the service is running properly.
 
 
-The logs are stored in syslog by default, to check the logs just do `journalctl -u git2consul`
+The logs are stored in syslog by default, to check the logs just do `journalctl -u git2consul`.
+
+A log directory is also available under `/var/log/git2consul` but you have to add a logger option to the configuration.
+
+Logger example :
+
+```
+  "logger": {
+    "name": "git2consul",
+    "streams": [
+      {
+        "level": "debug",
+        "type": "rotating-file",
+        "path": "/var/log/git2consul/git2consul.log"
+      }
+    ]
+  }
+```
+
 
 The service assumes that consul is running on the machine with the default port(8500).
 

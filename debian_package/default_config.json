@@ -1,12 +1,28 @@
 {
   "version": "1.0",
-  "repos" : [{
-    "name" : "sample_configuration",
-    "url" : "https://github.com/ryanbreen/git2consul_data.git",
-    "branches" : ["dev"],
-    "hooks": [{
-      "type" : "polling",
-      "interval" : "1"
-    }]
-  }]
+  "logger": {
+    "name": "git2consul",
+    "streams": [
+      {
+        "level": "debug",
+        "type": "rotating-file",
+        "path": "/var/log/git2consul/git2consul.log"
+      }
+    ]
+  },
+  "repos": [
+    {
+      "name": "sample_configuration",
+      "url": "https://github.com/ryanbreen/git2consul_data.git",
+      "branches": [
+        "dev"
+      ],
+      "hooks": [
+        {
+          "type": "polling",
+          "interval": "1"
+        }
+      ]
+    }
+  ]
 }

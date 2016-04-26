@@ -1,15 +1,15 @@
 language: node_js
 sudo: false
 before_script:
-- wget  https://dl.bintray.com/mitchellh/consul/0.4.0_linux_amd64.zip
-- unzip 0.4.0_linux_amd64.zip
+- wget  https://releases.hashicorp.com/consul/0.6.3/consul_0.6.3_linux_amd64.zip
+- unzip consul_0.6.3_linux_amd64.zip
 - mkdir consul_data
-- ./consul agent -server -bootstrap -data-dir=consul_data &
+- "./consul agent -server -bootstrap -data-dir=consul_data &"
 - sleep 2
 - git config --global user.email "ryan@ryanbreen.com"
 - git config --global user.name "Ryan Breen"
 script:
-- npm run coveralls
+- npm run test
 deploy:
   provider: npm
   email: ryan@ryanbreen.com
@@ -17,6 +17,6 @@ deploy:
     tags: true
     all_branches: true
   api_key:
-    secure: LQSP9xxSRd8wca1TfwmQzfNIksvNEVw+dFLWduuEmj9vvd6mQth+wJVLWH16alSo0FzKlR0CRMQ3iA1Srw4oL48NvPo/impanZBrKS7uIKf8iqF6kEnmgRRcJ5F96jorbv3wTAYMPiaq2pivwX/VRAPmZiCYYJI1TnSNKPReTxc=
+    secure: N5Xu1GdCVfi2FcXqck09BR9ko3Kki/D9aC0XgncsOja8rIN6ojMwcbnSU/tBUVFVUS48rNwFP5ta91Az9FFQEmAQa4vIyTB4XA9h4jKCFBylJtH89SlxBMK6UPndCL9e8A1jDroJRkkVnIWVfcol5xrLP01w0FIoJVg7OFfZLP8=
 after_success:
 - node_modules/coveralls/bin/coveralls.js < reports/lcov.info

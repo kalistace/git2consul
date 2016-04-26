@@ -6,7 +6,7 @@ git2consul takes one or many git repositories and mirrors them into [Consul](htt
 
 #### Installation
 
-`npm install git2consul`
+`npm install -g git2consul`
 
 #### Mailing List
 
@@ -15,6 +15,7 @@ git2consul takes one or many git repositories and mirrors them into [Consul](htt
 #### Requirements / Caveats
 
 * git2consul does most of its Git work by shelling out to git.  Git must be installed and on your path.
+* Remote git repos must be world-readable or you need to use an ssh URL: git2consul has no mechanism to present HTTP credentials to git.
 * git2consul does the rest of its work by calling Consul's REST API.
 * git2consul requires write access to the KV store of its Consul agent.
 * git2consul has only been tested on Unix.
@@ -27,7 +28,10 @@ I've created a [simple repo with a few sample configuration files of different t
 
 The most minimalistic viable git2consul configuration mirrors a single git repo into the KV store with a given prefix.  Here's how that would look mirroring the dev branch at `https://github.com/ryanbreen/git2consul_data.git` into the Consul K/V store with prefix `sample_configuration`:
 
-```javascript
+
+
+```bash
+cat <<EOF > /tmp/git2consul.json
 {
   "version": "1.0",
   "repos" : [{
@@ -40,30 +44,19 @@ The most minimalistic viable git2consul configuration mirrors a single git repo 
     }]
   }]
 }
-```
-
-Put that configuration in a file called `/tmp/git2consul.json`.  From the git2consul directory, upload that JSON file into the local KV as your git2consul config:
-
-```
-node utils/config_seeder.js /tmp/git2consul.json
-```
-
-or for remote Consul endpoint:
-
-```
-node utils/config_seeder.js --endpoint remote.consul.host --port 80 /tmp/git2consul.json
+EOF
 ```
 
 Start git2consul:
 
 ```
-node .
+git2consul --config-file /tmp/git2consul.json
 ```
 
 or for remote Consul endpoint:
 
 ```
-node . --endpoint remote.consul.host --port 80
+git2consul --endpoint remote.consul.host --port 80 --config-file /tmp/git2consul.json
 ```
 
 git2consul will now poll the "dev" branch of the "git2consul_data.git" repo once per minute.  On first run, it will mirror the 3 files into your Consul K/V with keys:
@@ -144,7 +137,25 @@ If you are using a more [Twelve-Factor](http://12factor.net/) approach, where yo
 
 As changes are detected in the specified Git repos, git2consul determines which files have been added, updated, or deleted and replicates those changes to the KV.  Because only changed branches and files are analyzed, git2consul should have a very slim profile on hosting systems.
 
+#### Environment variables
+
+There are environment variable equivalents for the parameters that git2consul accept
+
+* `CONSUL_ENDPOINT` maps to `-e` or `--endpoint`
+* `CONSUL_PORT` maps to `-p` or `--port`
+* `CONSUL_SECURE` maps to `-s` or `--secure`
+* `TOKEN` maps to `-t` or `--token`
+
+
 #### Alternative Modes of Operation
+
+##### Alternate Config Locations
+
+By default, git2consul looks for its configuration at the Consul Key `git2consul/config`.  You can override this with a `-c` of `--config_key` command line switch, like so:
+
+```sh
+git2consul -c git2consul/alternative_config
+```
 
 ##### No Daemon
 
@@ -201,7 +212,7 @@ bar=bar
 foo=${bar}
 ```
 
-Note: 
+Note:
 - the tokens **#** and **!** are parsed as comment tokens.
 - the tokens **=**, **whitespace** and **:** are parsed as separator tokens.
 
@@ -209,7 +220,7 @@ Example, if you have a file `simple.properties` :
 
 `bar=foo`
 
-git2consul will generate 
+git2consul will generate
 
 ```
 /expand_keys/simple.properties/bar
@@ -302,12 +313,12 @@ and `simple.properties` :
 
 `foo=${foo}`
 
-git2consul will generate 
-           
+git2consul will generate
+
 ```
 /expand_keys/simple.properties/foo
 ```
-           
+
 returning `bar`.
 
 Note :
@@ -321,7 +332,7 @@ Note :
 If you don't have grunt `sudo npm install -g grunt-cli`.
 
 git2consul can be packaged in .deb file. Simply run
- 
+
  ```
  npm install
  grunt debian_package

@@ -74,21 +74,17 @@ var logger = require('../lib/logging.js');
   });
 });
 
-// Add a file for the config, commit it, and validate that it has populated properly.
-function create_tag_and_check_consul(version, repo_name, sample_key, done) {
-  git_commands.tag(version, "first release", git_utils.TEST_REMOTE_REPO, function (err) {
-      if (err) return done(err);
+function check_tag_exist(version, repo_name, sample_key, tag_should_exist, done) {
+  consul_utils.waitForValue(repo_name + '/master/' + sample_key, function (err) {
+    if (err) return done(err);
 
-      consul_utils.waitForValue(repo_name + '/master/' + sample_key, function (err) {
-        if (err) return done(err);
-
-        consul_utils.waitForValue(repo_name + '/' + version + '/' + sample_key, function (err) {
-          if (err) return done(err);
-          done();
-        });
-      });
+    consul_utils.waitForValue(repo_name + '/' + version + '/' + sample_key, function (err) {
+      if (err && tag_should_exist) return done(err);
+      done();
     });
+  });
 }
+
 function extractReqInfo(config) {
   var req_conf = {url: config.fqurl, method: 'POST'};
   if (config.type === 'bitbucket') {
@@ -275,7 +271,10 @@ describe('webhook with support_tags', function() {
           var version = "v1.5_7";
           config.body = {ref: "refs/tag/" + version, head_commit: {id: 12345}};
           var req_conf_for_tag = extractReqInfo(config);
-          create_tag_and_check_consul(version, 'test_repo', sample_key, cb);
+          git_commands.tag(version, "first release", git_utils.TEST_REMOTE_REPO, function (err) {
+            if (err) return cb(err);
+            check_tag_exist(version, 'test_repo', sample_key, true, cb);
+          });
           request(req_conf_for_tag, function (err) {
             if (err) return cb(err);
           });
@@ -388,7 +387,46 @@ describe('polling hook', function() {
       git_utils.addFileToGitRepo(sample_key, sample_value, "Polling hook.", function (err) {
         if (err) return done(err);
         var version = "v1";
-        create_tag_and_check_consul(version, repo_config.name, sample_key, done);
+        git_commands.tag(version, "first release", git_utils.TEST_REMOTE_REPO, function (err) {
+          if (err) return done(err);
+          check_tag_exist(version, repo_config.name, sample_key, true, done);
+        });
+      });
+    });
+  });
+
+
+  it('should handle polling updates for tags with specific regex', function (done) {
+
+    var repo_config = git_utils.createRepoConfig();
+    repo_config.support_tags = true;
+    repo_config.regex_tags = "release-.*"
+    repo_config.hooks = [{
+      'type': 'polling',
+      'interval': '1',
+    }];
+    repo_config.name = "polling_test_tags";
+
+    git_utils.initRepo(repo_config, function (err, repo) {
+      if (err) return done(err);
+
+      repo.hooks_active.should.equal(true);
+
+      var sample_key = 'sample_key';
+      var sample_value = 'stash test data';
+      git_utils.addFileToGitRepo(sample_key, sample_value, "Polling hook.", function (err) {
+        if (err) return done(err);
+        var version_not_in_consul = "v1";
+        git_commands.tag(version_not_in_consul, "first release", git_utils.TEST_REMOTE_REPO, function (err) {
+          if (err) return done(err);
+          check_tag_exist(version_not_in_consul, repo_config.name, sample_key, false, function () {
+            var version_in_consul = "release-v1";
+            git_commands.tag(version_in_consul, "first release", git_utils.TEST_REMOTE_REPO, function (err) {
+              if (err) return done(err);
+              check_tag_exist(version_in_consul, repo_config.name, sample_key, true, done);
+            });
+          });
+        });
       });
     });
   });

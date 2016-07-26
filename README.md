@@ -281,6 +281,12 @@ usage example :
 
 This feature will only work with **annotated tags**. `man git-tag` for more information about annotated tags
 
+##### regex_tags (default: ".*")
+
+This repo-level option used in combination with the `support_tags` allows to specify a javascript regex in order to mirror only a subset of the tags.
+
+This is useful if you have different tag naming convention (e.g. different environments : integration-4.1254 vs production-4.1255; `production-.*` would only mirror production tags)
+
 ##### common_properties (default: undefined)
 
 a `common_properties` is a repo-level option instructing git2consul to inject common/shared properties as variables into other .properties files.

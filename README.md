@@ -182,7 +182,8 @@ Example :
    ...
   ],
   ...
-}```
+}
+```
 
 Will allow Node to only maintain one socket at a time.
 
